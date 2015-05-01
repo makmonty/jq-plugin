@@ -41,14 +41,14 @@
       jq.plugin.cache[selector]._collection = !!collection;
     }
 
-    if( !jq.plugin.ready ) {
-      $.plugin.run($doc, selector);
-    } else if( jq.plugin.running ) {
-      jq.plugin.running = true;
+    if( jq.plugin.ready ) {
+      jq.plugin.run($doc, selector);
+    } else if( !jq.plugin.loading ) {
+      jq.plugin.loading = true;
       jq.plugin.init($doc);
     }
   };
-  jq.plugin.running = false;
+  jq.plugin.loading = false;
   jq.plugin.cache = {};
   jq.plugin.run = function (jBase, pluginSelector) {
 
@@ -65,10 +65,11 @@
   };
 
   jq.plugin.init = function (jBase) {
-    $(function () {
+    jq(function () {
       for( var pluginSelector in jq.plugin.cache ) {
         jq.plugin.run(jBase, pluginSelector);
       }
+      jq.plugin.loading = false;
       jq.plugin.ready = true;
     });
   };
@@ -80,7 +81,7 @@
 
       if( jqWidget.enabled ) {
         console.log('running widget directly', widgetName);
-        $('[data-widget="' + widgetName + '"]').each(handler);
+        jq('[data-widget="' + widgetName + '"]').each(handler);
       } else if( !jqWidget.loading ) {
         jqWidget.loading = true;
         jqWidget.init();
@@ -89,7 +90,7 @@
   }
 
   jqWidget.init = function () {
-    $(function () {
+    jq(function () {
       jq.plugin('[data-widget]', function () {
         var widgetName = this.getAttribute('data-widget');
 
@@ -99,8 +100,8 @@
           jqWidget.widgets[widgetName].call(this);
         }
       });
-      jqWidget.enabled = true;
       jqWidget.loading = false;
+      jqWidget.enabled = true;
     });
   };
   jqWidget.widgets = {};
