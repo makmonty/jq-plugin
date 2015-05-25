@@ -111,11 +111,13 @@
   var jqHtml = jq.fn.html;
 
   jq.fn.html = function (html) {
-    jqHtml.apply(this, arguments);
+    var result = jqHtml.apply(this, arguments);
 
     if(html) {
       jq.plugin.init(this);
     }
+
+    return result;
   };
 
 })(this);
