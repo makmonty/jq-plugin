@@ -59,7 +59,7 @@
 					 element.$$plugins[pluginSelector] = true;
 					 return true;
 				 }
-			 }
+			 };
 		 }
 		 return pluginSelectorFilter.cache[pluginSelector];
 	 }
