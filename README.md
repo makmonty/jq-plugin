@@ -24,16 +24,22 @@ Usage
 > $.plugin
 
 ``` html
-<button>Hola</button>
+<button class="click">Click Me</button>
 ```
 
 ``` js
-// $.plugin(selector, handler, isCollection?)
-$.plugin('button', function () {
-  var jBtn = $(this);
+$.plugin('button.click', function () {
+  var jBtn = $(this),
+      alt = false;
 
   jBtn.click(function () {
-    alert(jBtn.text());
+    alt = !alt;
+    if( alt ) {
+      jBtn.text('it works!');
+    } else {
+      jBtn.text('Click Me');
+    }
+
   });
 });
 ```
