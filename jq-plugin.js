@@ -50,10 +50,25 @@
   };
   jq.plugin.loading = false;
   jq.plugin.cache = {};
+
+	 function pluginSelectorFilter (pluginSelector) {
+		 if( !pluginSelectorFilter.cache[pluginSelector] ) {
+			 pluginSelectorFilter.cache[pluginSelector] = function (element) {
+				 element.$$plugins = element.$$plugins || {};
+				 if( !element.$$plugins[pluginSelector] ) {
+					 element.$$plugins[pluginSelector] = true;
+					 return true;
+				 }
+			 }
+		 }
+		 return pluginSelectorFilter.cache[pluginSelector];
+	 }
+	 pluginSelectorFilter.cache = {};
+
   jq.plugin.run = function (jBase, pluginSelector) {
 
     var handler = jq.plugin.cache[pluginSelector],
-        elements = jBase.find(pluginSelector);
+        elements = jBase.find(pluginSelector).filter( pluginSelectorFilter(pluginSelector) );
 
     if( elements.length ) {
       if( handler._collection ) {
@@ -108,16 +123,10 @@
 
   jq.widget = jqWidget;
 
-  var jqHtml = jq.fn.html;
-
-  jq.fn.html = function (html) {
-    var result = jqHtml.apply(this, arguments);
-
-    if(html) {
-      jq.plugin.init(this);
-    }
-
-    return result;
-  };
+	 jq(function () {
+    jq(document.body).on('DOMSubtreeModified propertychange', function (e) {
+      jq.plugin.init(jq(event.target));
+    });
+  });
 
 })(this);
