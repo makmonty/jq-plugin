@@ -14,8 +14,14 @@ npm install jq-plugin --save
 bower install jq-plugin --save
 ```
 
+Demo
+----
+http://plnkr.co/edit/NSaBssbFXBjDcIRljy92
+
 Usage
 -----
+
+> $.plugin
 
 ``` html
 <button>Hola</button>
@@ -29,5 +35,31 @@ $.plugin('button', function () {
   jBtn.click(function () {
     alert(jBtn.text());
   });
+});
+```
+
+> $.widget
+
+``` html
+<div data-widget="test">
+  <ul>
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+  </ul>
+</div>
+```
+
+``` js
+$.widget('test', function () {
+  console.log('widget', this);
+
+  $(this).find('li')
+    .on('mouseover', function() {
+      this.style.fontWeight = 'bold';
+    })
+    .on('mouseout', function() {
+      this.style.fontWeight = 'normal';
+    });
 });
 ```
