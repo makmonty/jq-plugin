@@ -16,7 +16,7 @@ bower install jq-plugin --save
 
 Demo
 ----
-http://plnkr.co/edit/NSaBssbFXBjDcIRljy92
+http://plnkr.co/edit/NSaBssbFXBjDcIRljy92?p=preview
 
 Usage
 -----
