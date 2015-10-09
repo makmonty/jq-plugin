@@ -53,10 +53,10 @@
 
 	 function pluginSelectorFilter (pluginSelector) {
 		 if( !pluginSelectorFilter.cache[pluginSelector] ) {
-			 pluginSelectorFilter.cache[pluginSelector] = function (element) {
-				 element.$$plugins = element.$$plugins || {};
-				 if( !element.$$plugins[pluginSelector] ) {
-					 element.$$plugins[pluginSelector] = true;
+			 pluginSelectorFilter.cache[pluginSelector] = function () {
+				 this.$$plugins = this.$$plugins || {};
+				 if( !this.$$plugins[pluginSelector] ) {
+					 this.$$plugins[pluginSelector] = true;
 					 return true;
 				 }
 			 };
