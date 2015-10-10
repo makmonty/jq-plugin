@@ -123,8 +123,8 @@
 
   jq.widget = jqWidget;
 
-	 jq(function () {
-    jq(document.body).on('DOMSubtreeModified propertychange', function (e) {
+  jq(function () {
+    jq(document.body).on('DOMSubtreeModified propertychange', function (event) {
       jq.plugin.init(jq(event.target));
     });
   });
