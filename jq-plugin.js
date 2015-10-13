@@ -45,7 +45,11 @@
       jq.plugin.run($doc, selector);
     } else if( !jq.plugin.loading ) {
       jq.plugin.loading = true;
-      jq.plugin.init($doc);
+      jq(function () {
+        jq.plugin.init($doc);
+        jq.plugin.loading = false;
+        jq.plugin.ready = true;
+      });
     }
   };
   jq.plugin.loading = false;
@@ -70,6 +74,8 @@
     var handler = jq.plugin.cache[pluginSelector],
         elements = jBase.find(pluginSelector).filter( pluginSelectorFilter(pluginSelector) );
 
+    console.log('pluginSelector', pluginSelector, elements);
+
     if( elements.length ) {
       if( handler._collection ) {
         handler( elements );
@@ -80,13 +86,9 @@
   };
 
   jq.plugin.init = function (jBase) {
-    jq(function () {
-      for( var pluginSelector in jq.plugin.cache ) {
-        jq.plugin.run(jBase, pluginSelector);
-      }
-      jq.plugin.loading = false;
-      jq.plugin.ready = true;
-    });
+    for( var pluginSelector in jq.plugin.cache ) {
+      jq.plugin.run(jBase, pluginSelector);
+    }
   };
 
   function jqWidget (widgetName, handler) {
@@ -96,7 +98,9 @@
 
       if( jqWidget.enabled ) {
         console.log('running widget directly', widgetName);
-        jq('[data-widget="' + widgetName + '"]').each(handler);
+        if( !jqWidget.loading ) {
+          jq('[data-widget="' + widgetName + '"]').each(handler);
+        }
       } else if( !jqWidget.loading ) {
         jqWidget.loading = true;
         jqWidget.init();
@@ -124,7 +128,8 @@
   jq.widget = jqWidget;
 
 	 jq(function () {
-    jq(document.body).on('DOMSubtreeModified propertychange', function (e) {
+    jq(document.body).on('DOMSubtreeModified', function (e) {
+      console.log('DOMSubtreeModified', e.target);
       jq.plugin.init(jq(event.target));
     });
   });
