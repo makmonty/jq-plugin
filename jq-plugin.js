@@ -1,5 +1,5 @@
 /*
- * css.js
+ * jq-plugin
  *
  * The MIT License (MIT)
  *
@@ -33,103 +33,133 @@
   }
 
   var jq = root.$,
-      $doc = jq(document);
+      jDoc = jq(document)
+      noop = function (value) { return value; },
+      pluginCache = {},
+      pluginsAre = {},
+      pluginsFilterCache = {};
 
-  jq.plugin = function (selector, handler, collection) {
-    if( typeof selector === 'string' && handler instanceof Function ) {
-      jq.plugin.cache[selector] = handler;
-      jq.plugin.cache[selector]._collection = !!collection;
+  function pluginSelectorFilter (pluginSelector) {
+    if( !pluginsFilterCache[pluginSelector] ) {
+      pluginsFilterCache[pluginSelector] = function (el) {
+
+        if( el.__found__ ) {
+          return false;
+        }
+        el.__found__ = true;
+
+        el.$$plugins = el.$$plugins || {};
+        if( !el.$$plugins[pluginSelector] ) {
+          el.$$plugins[pluginSelector] = true;
+          return true;
+        }
+      };
+    }
+    return pluginsFilterCache[pluginSelector];
+  }
+
+  function findElements (jBase, pluginSelector) {
+    var matches = [], n = 0, i, j, len, len2, filtered,
+        pluginFilter = pluginSelectorFilter(pluginSelector);
+
+    for( i = 0, len = jBase.length ; i < len ; i++ ) {
+      filtered = [].filter.call( jBase[i].querySelectorAll(pluginSelector), pluginFilter );
+      for( j = 0, len2 = filtered.length ; j < len2 ; j++ ) {
+        matches[n++] = filtered[j];
+      }
     }
 
-    if( jq.plugin.ready ) {
-      jq.plugin.run($doc, selector);
-    } else if( !jq.plugin.loading ) {
-      jq.plugin.loading = true;
-      jq(function () {
-        jq.plugin.init($doc);
-        jq.plugin.loading = false;
-        jq.plugin.ready = true;
-      });
+    for( i = 0 ; i < n ; i++ ) {
+      delete matches[i].__found__;
     }
-  };
-  jq.plugin.loading = false;
-  jq.plugin.cache = {};
 
-	 function pluginSelectorFilter (pluginSelector) {
-		 if( !pluginSelectorFilter.cache[pluginSelector] ) {
-			 pluginSelectorFilter.cache[pluginSelector] = function () {
-				 this.$$plugins = this.$$plugins || {};
-				 if( !this.$$plugins[pluginSelector] ) {
-					 this.$$plugins[pluginSelector] = true;
-					 return true;
-				 }
-			 };
-		 }
-		 return pluginSelectorFilter.cache[pluginSelector];
-	 }
-	 pluginSelectorFilter.cache = {};
+    return jq(matches);
+  }
 
-  jq.plugin.run = function (jBase, pluginSelector) {
+  function runPlugin (jBase, pluginSelector) {
+    var handler = pluginCache[pluginSelector],
+        elements = findElements(jBase, pluginSelector);
 
-    var handler = jq.plugin.cache[pluginSelector],
-        elements = jBase.find(pluginSelector).filter( pluginSelectorFilter(pluginSelector) );
-
-    if( elements.length ) {
+    if( handler && elements.length ) {
       if( handler._collection ) {
         handler( elements );
       } else {
         elements.each(handler);
       }
     }
-  };
-
-  jq.plugin.init = function (jBase) {
-    for( var pluginSelector in jq.plugin.cache ) {
-      jq.plugin.run(jBase, pluginSelector);
-    }
-  };
-
-  function jqWidget (widgetName, handler) {
-    if( typeof widgetName === 'string' && handler instanceof Function ) {
-
-      jqWidget.widgets[widgetName] = handler;
-
-      if( jqWidget.enabled ) {
-        console.log('running widget directly', widgetName);
-        if( !jqWidget.loading ) {
-          jq('[data-widget="' + widgetName + '"]').each(handler);
-        }
-      } else if( !jqWidget.loading ) {
-        jqWidget.loading = true;
-        jqWidget.init();
-      }
-    }
   }
 
-  jqWidget.init = function () {
+  function initPlugin () {
+    pluginsAre.loading = true;
     jq(function () {
-      jq.plugin('[data-widget]', function () {
-        var widgetName = this.getAttribute('data-widget');
+      for( var pluginSelector in pluginCache ) {
+        runPlugin(jDoc, pluginSelector);
+      }
 
-        console.log('running widget', widgetName);
+      jq(document.body).on('DOMSubtreeModified', function (e) {
+        var jTarget = jq(event.target);
 
-        if( jqWidget.widgets[widgetName] ) {
-          jqWidget.widgets[widgetName].call(this);
+        for( var pluginSelector in pluginCache ) {
+          runPlugin(jTarget, pluginSelector);
         }
       });
-      jqWidget.loading = false;
-      jqWidget.enabled = true;
+
+      delete pluginsAre.loading;
+      pluginsAre.running = true;
+    });
+  }
+
+  jq.plugin = function (selector, handler, collection) {
+    if( typeof selector !== 'string' || !(handler instanceof Function) ) {
+      throw new Error('required selector (string) and handler (function)');
+      return;
+    }
+
+    pluginCache[selector] = handler;
+    pluginCache[selector]._collection = !!collection;
+
+    if( pluginsAre.loading ) {
+      return;
+    }
+
+    if( pluginsAre.running ) {
+      runPlugin(jDoc, selector);
+    } else {
+      initPlugin();
+    }
+  };
+
+  // widgets
+
+  var widgets = {},
+      widgetsAre = {};
+
+  function initWidget () {
+    widgetsAre.loading = true;
+    jq(function () {
+      jq.plugin('[data-widget]', function () {
+        ( widgets[this.getAttribute('data-widget')] || noop ).call(this);
+      });
+      delete widgetsAre.loading;
+      widgetsAre.running = true;
     });
   };
-  jqWidget.widgets = {};
 
-  jq.widget = jqWidget;
+  jq.widget = function (widgetName, handler) {
+    if( typeof widgetName === 'string' && handler instanceof Function ) {
 
-	 jq(function () {
-    jq(document.body).on('DOMSubtreeModified', function (e) {
-      console.log('DOMSubtreeModified', e.target);
-      jq.plugin.init(jq(event.target));
-    });
-  });
+      widgets[widgetName] = handler;
+
+      if( !widgetsAre.loading ) {
+        return;
+      }
+
+      if( widgetsAre.running ) {
+        jq('[data-widget="' + widgetName + '"]').each(handler);
+      } else {
+        initWidget();
+      }
+    }
+  };
 
 })(this);
