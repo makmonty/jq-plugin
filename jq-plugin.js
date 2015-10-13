@@ -74,8 +74,6 @@
     var handler = jq.plugin.cache[pluginSelector],
         elements = jBase.find(pluginSelector).filter( pluginSelectorFilter(pluginSelector) );
 
-    console.log('pluginSelector', pluginSelector, elements);
-
     if( elements.length ) {
       if( handler._collection ) {
         handler( elements );
