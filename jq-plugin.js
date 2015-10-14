@@ -150,7 +150,7 @@
 
       widgets[widgetName] = handler;
 
-      if( !widgetsAre.loading ) {
+      if( widgetsAre.loading ) {
         return;
       }
 
