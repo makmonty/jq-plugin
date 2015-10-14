@@ -34,7 +34,6 @@
 
   var jq = root.$,
       jDoc = jq(document)
-      noop = function (value) { return value; },
       pluginCache = {},
       pluginsAre = {},
       pluginsFilterCache = {};
@@ -134,11 +133,17 @@
   var widgets = {},
       widgetsAre = {};
 
+  function missingWidget () {
+    if( this.$$plugins && this.$$plugins['[data-widget]'] ) {
+      delete this.$$plugins['[data-widget]'];
+    }
+  }
+
   function initWidget () {
     widgetsAre.loading = true;
     jq(function () {
       jq.plugin('[data-widget]', function () {
-        ( widgets[this.getAttribute('data-widget')] || noop ).call(this);
+        ( widgets[this.getAttribute('data-widget')] || missingWidget ).call(this);
       });
       delete widgetsAre.loading;
       widgetsAre.running = true;
