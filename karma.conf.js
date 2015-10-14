@@ -16,12 +16,18 @@ module.exports = function(config) {
     ],
     // browsers: [ 'Chrome', 'Firefox' ],
     browsers: [ 'Chrome' ],
+    customLaunchers: {
+      Chrome_travis_ci: {
+        base: 'Chrome',
+        flags: ['--no-sandbox']
+      }
+    },
     singleRun: true,
     reporters: ['story']
   };
 
   if(process.env.TRAVIS){
-    configuration.browsers = [ 'Chrome', 'Firefox' ];
+    configuration.browsers = [ 'Chrome_travis_ci', 'Firefox' ];
   }
 
   if( process.env.DRONE || process.env.WERCKER ){
