@@ -1,7 +1,7 @@
 {
 	"name": "jq-plugin",
 	"main": "jq-plugin.js",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"homepage": "https://github.com/jstools/jq-plugin",
 	"authors": [
 		"Jesús Germade <jesus@germade.es>"

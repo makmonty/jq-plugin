@@ -1,6 +1,6 @@
 {
 	"name": "jq-plugin",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"description": "scope jstool example",
 	"main": "jq-plugin.js",
 	"scripts": {
