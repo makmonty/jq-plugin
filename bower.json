@@ -1,23 +1,23 @@
 {
-    "name": "jq-plugin",
-    "main": "jq-plugin.js",
-    "version": "0.1.6",
-    "homepage": "https://github.com/jstools/jq-plugin",
-    "authors": [
-        "Jesús Germade <jesus@germade.es>"
-    ],
-    "description": "simple javascript scope",
-    "keywords": [
-        "javascript",
-        "jstools",
-        "scope"
-    ],
-    "license": "ISC",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test",
-        "tests"
-    ]
+	"name": "jq-plugin",
+	"main": "jq-plugin.js",
+	"version": "0.1.7",
+	"homepage": "https://github.com/jstools/jq-plugin",
+	"authors": [
+		"Jesús Germade <jesus@germade.es>"
+	],
+	"description": "simple javascript scope",
+	"keywords": [
+		"javascript",
+		"jstools",
+		"scope"
+	],
+	"license": "ISC",
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"test",
+		"tests"
+	]
 }
