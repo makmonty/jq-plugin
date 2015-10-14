@@ -95,7 +95,7 @@
         runPlugin(jDoc, pluginSelector);
       }
 
-      jq(document.body).on('DOMSubtreeModified', function (e) {
+      jq(document.body).on('DOMSubtreeModified', function (event) {
         var jTarget = jq(event.target);
 
         for( var pluginSelector in pluginCache ) {
