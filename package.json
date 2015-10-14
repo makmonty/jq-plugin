@@ -4,8 +4,7 @@
 	"description": "scope jstool example",
 	"main": "jq-plugin.js",
 	"scripts": {
-		"test": "grunt test",
-		"posttest": "grunt uglify:min"
+		"test": "make test"
 	},
 	"repository": {
 		"type": "git",
