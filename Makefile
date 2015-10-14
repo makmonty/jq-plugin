@@ -11,11 +11,10 @@ test:
 	node make build
 	@$(shell npm bin)/karma start karma.conf.js
 
-git.increaseVersion:
-	git fetch origin
-	git checkout master
-	@git pull origin master
-	@node make pkg:increaseVersion
+increaseVersion:
+	node make pkg:increaseVersion
+
+git.increaseVersion: increaseVersion
 	git commit -a -n -m "increased version [$(shell node make pkg:version)]"
 	@git push origin master
 	@echo "\n\trelease version: $(shell node make pkg:version)\n"
