@@ -18,6 +18,7 @@ git.increaseVersion:
 	@node make pkg:increaseVersion
 	git commit -a -n -m "increased version [$(shell node make pkg:version)]"
 	@git push origin master
+	@echo "\n\trelease version: $(shell node make pkg:version)\n"
 
 release: build git.increaseVersion
 
