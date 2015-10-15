@@ -60,11 +60,9 @@ $.plugin('button.click', function () {
 $.widget('test', function () {
   console.log('widget', this);
 
-  $(this).find('li')
-    .on('mouseover', function() {
+  $(this).find('li').hover(function() {
       this.style.fontWeight = 'bold';
-    })
-    .on('mouseout', function() {
+    }, function() {
       this.style.fontWeight = 'normal';
     });
 });
