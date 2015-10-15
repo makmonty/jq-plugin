@@ -18,6 +18,8 @@ Demo
 ----
 http://plnkr.co/edit/NSaBssbFXBjDcIRljy92?p=preview
 
+http://codepen.io/jgermade/pen/YyrRGL?editors=101
+
 Usage
 -----
 
