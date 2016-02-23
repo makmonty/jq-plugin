@@ -33,7 +33,7 @@
   }
 
   var jq = root.$,
-      jDoc = jq(document)
+      jDoc = jq(document),
       pluginCache = {},
       pluginsAre = {},
       pluginsFilterCache = {};
