@@ -38,15 +38,21 @@
       pluginsAre = {},
       pluginsFilterCache = {};
 
+  function filter (list, iteratee) {
+    var result = [], n = 0;
+
+    for( var i = 0, len = list.length; i < len ; i++ ) {
+      if( iteratee(list[i]) ) {
+        result[n++] = list[i];
+      }
+    }
+
+    return jq(result);
+  }
+
   function pluginSelectorFilter (pluginSelector) {
     if( !pluginsFilterCache[pluginSelector] ) {
       pluginsFilterCache[pluginSelector] = function (el) {
-
-        if( el.__found__ ) {
-          return false;
-        }
-        el.__found__ = true;
-
         el.$$plugins = el.$$plugins || {};
         if( !el.$$plugins[pluginSelector] ) {
           el.$$plugins[pluginSelector] = true;
@@ -57,27 +63,9 @@
     return pluginsFilterCache[pluginSelector];
   }
 
-  function findElements (jBase, pluginSelector) {
-    var matches = [], n = 0, i, j, len, len2, filtered,
-        pluginFilter = pluginSelectorFilter(pluginSelector);
-
-    for( i = 0, len = jBase.length ; i < len ; i++ ) {
-      filtered = [].filter.call( jBase[i].querySelectorAll(pluginSelector), pluginFilter );
-      for( j = 0, len2 = filtered.length ; j < len2 ; j++ ) {
-        matches[n++] = filtered[j];
-      }
-    }
-
-    for( i = 0 ; i < n ; i++ ) {
-      delete matches[i].__found__;
-    }
-
-    return jq(matches);
-  }
-
-  function runPlugin (jBase, pluginSelector) {
+  function runPlugin (target, pluginSelector) {
     var handler = pluginCache[pluginSelector],
-        elements = findElements(jBase, pluginSelector);
+        elements = filter( jq(pluginSelector), pluginSelectorFilter(pluginSelector) );
 
     if( handler && elements.length ) {
       if( handler._collection ) {
@@ -92,14 +80,12 @@
     pluginsAre.loading = true;
     jq(function () {
       for( var pluginSelector in pluginCache ) {
-        runPlugin(jDoc, pluginSelector);
+        runPlugin(document, pluginSelector);
       }
 
       jq(document.body).on('DOMSubtreeModified', function (event) {
-        var jTarget = jq(event.target);
-
         for( var pluginSelector in pluginCache ) {
-          runPlugin(jTarget, pluginSelector);
+          runPlugin(event.target, pluginSelector);
         }
       });
 
@@ -122,7 +108,7 @@
     }
 
     if( pluginsAre.running ) {
-      runPlugin(jDoc, selector);
+      runPlugin(document, selector);
     } else {
       initPlugin();
     }

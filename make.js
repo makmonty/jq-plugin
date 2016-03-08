@@ -27,4 +27,16 @@ require('nitro')(function (nitro) {
     process.exit(0);
   });
 
+  nitro.task('demo', function (target) {
+
+    nitro.server({
+      root: 'demo',
+      dirAlias: {
+        lib: '.'
+      },
+      openInBrowser: true
+    });
+
+  });
+
 }).run();
