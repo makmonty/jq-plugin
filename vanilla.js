@@ -54,14 +54,27 @@ if( !Element.prototype.addEventListener ) {
 }(this, function () {
 
   function ready (callback) {
-    if( _isFunction(callback) ) {
-      if (/loaded|complete/.test(document.readyState)) {
-        callback();
+    if( callback instanceof Function ) {
+      console.log('ready', ready.waiting && ready.waiting.length );
+      if( ready.waiting ) {
+        ready.waiting.push(callback);
       } else {
-        _onLoad(callback);
+        callback();
       }
     }
   }
+  ready.waiting = [];
+  ready.init = function () {
+    var waiting = ready.waiting;
+    delete ready.waiting;
+    if( waiting ) {
+      waiting.forEach(function (cb) { cb(); });
+    }
+    document.removeEventListener('DOMContentLoaded', ready.init);
+    window.removeEventListener('load', ready.init);
+  };
+  document.addEventListener('DOMContentLoaded', ready.init);
+  window.addEventListener('load', ready.init);
 
   var pluginCache = {},
       pluginsAre = {},
@@ -101,7 +114,9 @@ if( !Element.prototype.addEventListener ) {
       if( handler._collection ) {
         handler( elements );
       } else {
-        each.call(elements, handler);
+        each.call(elements, function (el, i){
+          handler.call(el, el, i);
+        });
       }
     }
   }
@@ -176,7 +191,7 @@ if( !Element.prototype.addEventListener ) {
       }
 
       if( widgetsAre.running ) {
-        each.call(document.querySelectorAll('[data-widget="' + widgetName + '"]', handler);
+        each.call(document.querySelectorAll('[data-widget="' + widgetName + '"]'), handler);
       } else {
         initWidget();
       }
@@ -186,4 +201,4 @@ if( !Element.prototype.addEventListener ) {
   $plugin.ready = ready;
 
   return $plugin;
-});
+}));
